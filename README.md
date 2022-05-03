@@ -29,19 +29,19 @@ The below convars likely will need to be setup on a per level basis as different
 
 **eotl_rolled_time_rolled [minutes]**
 
-If blue won and round lasted less then [minutes] minutes then a random rolled sound will play from the config.  A value of -1 will disable this setting.
+If blue won and round lasted less then [minutes] minutes, then a random rolled sound will play from the config.  A value of -1 will disable this setting.
 
 Default: 8
 
 **eotl_rolled_time_stuffed [minutes]**
 
-If red won and round lasted less then [minutes] minutes then a random stuffed sound will play from the config.  A value of -1 will disable this setting.
+If red won and round lasted less then [minutes] minutes, then a random stuffed sound will play from the config.  A value of -1 will disable this setting.
 
 Default: -1
 
 **eotl_rolled_cap_stuffed [num]**
 
-If red won and blue capped <= <num> cap points then a random stuffed sound will play from the config.  A value of -1 will disable this setting.
+If red won and blue capped <= [num] cap points, then a random stuffed sound will play from the config.  A value of -1 will disable this setting.
 
 Default: 1
 
