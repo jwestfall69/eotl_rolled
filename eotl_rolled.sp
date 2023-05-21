@@ -7,11 +7,9 @@
 #include <clientprefs>
 
 #define PLUGIN_AUTHOR  "ack"
-#define PLUGIN_VERSION "0.8"
+#define PLUGIN_VERSION "0.9"
 
 #define CONFIG_FILE    "configs/eotl_rolled.cfg"
-#define KV_FLOAT_UNSET -3.14259
-#define KV_INT_UNSET   -314259
 
 public Plugin myinfo = {
 	name = "eotl_rolled",
@@ -298,10 +296,10 @@ void LoadClientConfig(int client) {
 
     char enableState[6];
     GetClientCookie(client, g_hClientCookies, enableState, 6);
-    if(StrEqual(enableState, "true")) {
-        g_bPlayerEnabled[client] = true;
-    } else {
+    if(StrEqual(enableState, "false")) {
         g_bPlayerEnabled[client] = false;
+    } else {
+        g_bPlayerEnabled[client] = true;
     }
 
     LogDebug("client: %N has rolled %s", client, g_bPlayerEnabled[client] ? "enabled" : "disabled");

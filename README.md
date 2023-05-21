@@ -1,10 +1,10 @@
 # eotl_rolled
 
-This is a TF2 sourcemod plugin.
+This is a TF2 sourcemod plugin I wrote for the [EOTL](https://www.endofthelinegaming.com/) community.
 
 This plugin is targeted at playload maps.  If blue team wins the playload map fast enough (rolled) or red team blocks blue on one of the early cap points (stuffed) it will cause a sound to be played.
 
-By default sounds from this plugin are disabled for players.
+By default sounds from this plugin are enabled for players.
 
 
 ### Config File (addons/sourcemod/configs/eotl_rolled.cfg)
