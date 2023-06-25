@@ -2,7 +2,7 @@
 
 This is a TF2 sourcemod plugin I wrote for the [EOTL](https://www.endofthelinegaming.com/) community.
 
-This plugin is targeted at playload maps.  If blue team wins the playload map fast enough (rolled) or red team blocks blue on one of the early cap points (stuffed) it will cause a sound to be played.
+This plugin is targeted at payload maps.  If blue team wins the payload map fast enough (rolled) or red team blocks blue on one of the early cap points (stuffed) it will cause a sound to be played.  Additionally the plugin will trigger a OnTeamRolled forward that is used by the eotl_respawn plugin for auto adjusting respawn times.
 
 By default sounds from this plugin are enabled for players.
 

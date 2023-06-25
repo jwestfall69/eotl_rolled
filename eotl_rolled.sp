@@ -5,9 +5,10 @@
 #include <sdktools>
 #include <tf2>
 #include <clientprefs>
+#include "eotl_rolled.inc"
 
 #define PLUGIN_AUTHOR  "ack"
-#define PLUGIN_VERSION "0.9"
+#define PLUGIN_VERSION "0.10"
 
 #define CONFIG_FILE    "configs/eotl_rolled.cfg"
 
@@ -31,6 +32,9 @@ int g_caps;
 float g_roundStartTime;
 Handle g_hClientCookies;
 bool g_bPlayerEnabled[MAXPLAYERS + 1];
+bool g_isPayloadMap;
+
+GlobalForward g_OnTeamRolledForward;
 
 public void OnPluginStart() {
     LogMessage("version %s starting", PLUGIN_VERSION);
@@ -42,10 +46,11 @@ public void OnPluginStart() {
     g_cvDelay = CreateConVar("eotl_rolled_delay", "5.0", "Delay seconds before playing sound at end of round");
     g_cvDebug = CreateConVar("eotl_rolled_debug", "0", "0/1 enable debug output", FCVAR_NONE, true, 0.0, true, 1.0);
 
-
     g_soundsRolled = CreateArray(PLATFORM_MAX_PATH);
     g_soundsStuffed = CreateArray(PLATFORM_MAX_PATH);
     g_hClientCookies = RegClientCookie("rolled enabled", "rolled enabled", CookieAccess_Private);
+
+    g_OnTeamRolledForward = CreateGlobalForward("OnTeamRolled", ET_Event, Param_Cell, Param_Cell);
 
     HookEvent("teamplay_round_start", EventRoundStart, EventHookMode_PostNoCopy);
     HookEvent("teamplay_round_win", EventRoundWin);
@@ -54,6 +59,15 @@ public void OnPluginStart() {
 }
 
 public void OnMapStart() {
+    char mapName[32];
+
+    GetCurrentMap(mapName, sizeof(mapName));
+    if(strncmp(mapName, "pl_", 3) == 0) {
+        g_isPayloadMap = true;
+    } else {
+        g_isPayloadMap = false;
+    }
+
     for(int client = 1;client <= MaxClients; client++) {
         g_bPlayerEnabled[client] = false;
     }
@@ -109,8 +123,16 @@ public Action EventRoundStart(Handle event, const char[] name, bool dontBroadcas
 }
 
 public Action EventRoundWin(Handle event, const char[] name, bool dontBroadcast) {
+
+    if(!g_isPayloadMap) {
+        LogDebug("Skipping rolled check, not a payload map");
+        return Plugin_Continue;
+    }
+
     float roundTime = (GetGameTime() - g_roundStartTime) / 60.0;
     TFTeam winTeam = view_as<TFTeam>(GetEventInt(event, "team"));
+    bool isMiniRound = !GetEventInt(event, "full_round");
+    int rollType = ROLL_TYPE_NONE;
 
     float timeRolled = g_cvTimeRolled.FloatValue;
     float timeStuffed = g_cvTimeStuffed.FloatValue;
@@ -119,7 +141,6 @@ public Action EventRoundWin(Handle event, const char[] name, bool dontBroadcast)
 
     char mapName[PLATFORM_MAX_PATH];
     GetCurrentMap(mapName, PLATFORM_MAX_PATH);
-
 
     if(delay <= 0.0) {
         delay = 0.1;
@@ -151,6 +172,7 @@ public Action EventRoundWin(Handle event, const char[] name, bool dontBroadcast)
         if(index < g_soundsRolled.Length) {
             CreateTimer(delay, PlaySoundRolled, index, TIMER_FLAG_NO_MAPCHANGE);
         }
+        rollType = ROLL_TYPE_ROLLED;
 
     // red time won, check for stuffed
     } else if(winTeam == TFTeam_Red) {
@@ -182,8 +204,14 @@ public Action EventRoundWin(Handle event, const char[] name, bool dontBroadcast)
         if(index < g_soundsStuffed.Length) {
             CreateTimer(delay, PlaySoundStuffed, index, TIMER_FLAG_NO_MAPCHANGE);
         }
-
+        rollType = ROLL_TYPE_STUFFED;
     }
+
+    Call_StartForward(g_OnTeamRolledForward);
+    Call_PushCell(rollType);
+    Call_PushCell(isMiniRound);
+    Call_Finish();
+
     return Plugin_Continue;
 }
 
